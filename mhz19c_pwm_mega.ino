@@ -1,4 +1,5 @@
 #include "MHZCO2.h"
+#include "gitTagVersion.h"
 
 #include <SPI.h>
 #include <Wire.h>
@@ -69,12 +70,11 @@ void setup() {
   Serial.println(__FILE__);
   Serial.print("MHZCO2_LIB_VERSION: ");
   Serial.println(MHZCO2_LIB_VERSION);
+  Serial.println("\nBME680 DS1820 MQTT publisher " + String(sketchVersion));
   
   attachInterrupt(digitalPinToInterrupt(pwmPin), IRQ, CHANGE);
 
-  
-
-    if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
@@ -105,7 +105,7 @@ void loop() {
   
   int myVal = digitalRead(pwmPin);
 
-  //Если обнаружили изменение
+  //when changes are found
   if (myVal == HIGH) {
     digitalWrite(LedPin, HIGH);
     if (myVal != prevVal) {
@@ -123,28 +123,17 @@ void loop() {
       Serial.println("PPM = " + String(ppm));
       if (tt - tt_show > 3000) {
         tt_show = tt;
-        //showCo2Ppm(ppm - 3000);
         showCo2Ppm(ppm);
       }
     }
   }
-  //delay(1000);
-      if (elapsedTime >= oneHour) {
-        Serial.println("1 hour has passed!");
-        // Reset the timer or perform your desired action
-        startMillis = millis(); // Reset the timer if needed
-        resetMega();
-    } 
+  if (elapsedTime >= oneHour){
+    Serial.println("1 hour has passed!");
+    // Reset the timer or perform your desired action
+    startMillis = millis(); // Reset the timer if needed
+    resetMega();
+  }
 }
-
-void __loop()
-{
-  ppm = PWM_concentration();
-  Serial.println(ppm);
-  showCo2Ppm(ppm);
-  delay(1000);
-}
-
 
 
 void showCo2Ppm(int co2) {
@@ -153,22 +142,11 @@ void showCo2Ppm(int co2) {
   display.setTextSize(6);
   display.setTextColor(WHITE);
   display.setCursor(0, 10);
-//  display.print("CO2");
-//  display.display();
-  //delay(500);
-/*
-  display.clearDisplay();
-  display.setCursor(0, 10);
-  display.print("PPM");
-  display.display();
-  //delay(500);
-*/
   display.clearDisplay();
   (co2 > 1000) ? display.setTextSize(4) : display.setTextSize(6);
   display.setCursor(0, 10);
   display.print(co2);
   display.display();
-  //delay(2000);
 }
 
 void resetMega(void) {
