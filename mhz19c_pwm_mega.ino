@@ -70,7 +70,7 @@ void setup() {
   Serial.println(__FILE__);
   Serial.print("MHZCO2_LIB_VERSION: ");
   Serial.println(MHZCO2_LIB_VERSION);
-  Serial.println("\nBME680 DS1820 MQTT publisher " + String(sketchVersion));
+  Serial.println("\nPWM MHZ-19C Reader v.0.1" + String(sketchVersion));
   
   attachInterrupt(digitalPinToInterrupt(pwmPin), IRQ, CHANGE);
 
