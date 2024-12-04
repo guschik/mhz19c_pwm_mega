@@ -31,6 +31,7 @@ const float MAX_CONCENTRATION = 2000.0;
 unsigned long startMillis; // Stores the starting time
 unsigned long elapsedTime; // Stores the elapsed time
 const unsigned long oneHour = 3600000; // 1 hour in milliseconds (60*60*1000)
+const unsigned long oneMin = 60000; // 1 hour in milliseconds (60*60*1000)
 
 volatile uint16_t width;
 
@@ -70,7 +71,7 @@ void setup() {
   Serial.println(__FILE__);
   Serial.print("MHZCO2_LIB_VERSION: ");
   Serial.println(MHZCO2_LIB_VERSION);
-  Serial.println("\nPWM MHZ-19C Reader v.0.1" + String(sketchVersion));
+  Serial.println("\nPWM MHZ-19C Reader v.0.1 " + String(sketchVersion));
   
   attachInterrupt(digitalPinToInterrupt(pwmPin), IRQ, CHANGE);
 
@@ -145,13 +146,15 @@ void showCo2Ppm(int co2) {
   display.clearDisplay();
   (co2 > 1000) ? display.setTextSize(4) : display.setTextSize(6);
   display.setCursor(0, 10);
-  display.print(co2);
+  if (co2 >= 400){
+    display.print(co2);  
+  } else {
+    display.print("N/A");  
+  }
+  
   display.display();
 }
 
 void resetMega(void) {
-    Serial.println("Resetting...");
-    digitalWrite(7, LOW); // Pull reset pin low
-    delay(100); // Hold reset pin low for 100ms
-    digitalWrite(7, HIGH); // Release reset pin
+  asm volatile("jmp 0"); // Jump to address 0 (reset vector)
 }
